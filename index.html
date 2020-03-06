@@ -1,0 +1,33 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>yep im a gamer</title>
+    <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+    <script src="js/mainmenu.js"></script>
+    <script src="js/play.js"></script>
+    <script src="js/gameover.js"></script>
+    <style type="text/css">
+        body {
+            margin-left: 400px;
+            margin-top: -40px;
+            zoom: 68%;
+            background-color: black;
+            overflow: hidden;
+        }
+    </style>
+
+<script>
+        (function() {
+            var game = new Phaser.Game(1000, 1000, Phaser.AUTO, "game");
+            var highscore = 0;
+            game.state.add("MainMenu",MainMenu);
+            game.state.add("Play",Play);
+            game.state.add("GameOver",GameOver);
+            game.state.start("MainMenu",MainMenu);
+        })();
+</script>
+</head>
+<body>
+</body>
+</html>
