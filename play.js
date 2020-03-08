@@ -50,7 +50,7 @@ Play.prototype = {
         moonY = this.game.height /2;
         playerMoonLine = new Phaser.Line(0,0,0,0);
         enemyIntersectLine = new Phaser.Line(0,0,0,0);
-        timerDifficulty = 5000;
+        timerDifficulty = 5500;
         spawnCount = 0;
         combo = 0;
         randColor = 0;
@@ -60,9 +60,8 @@ Play.prototype = {
     },
 
     create: function(){
-        //make moons
         if(typeof(highscore) == 'undefined'){highscore = 0;}
-
+        //make moons
         moon = this.add.sprite(this.game.width / 2, this.game.height / 2, "moon");
         moon.anchor.setTo(0.5);
         blackmoon = this.add.sprite(this.game.width / 2, this.game.height / 2, "blackmoon");
@@ -83,12 +82,11 @@ Play.prototype = {
         spawnEnemy.loop(timerDifficulty, this.makeEnemy, this);
         spawnEnemy.start();
 
+        //score decreases when inside moon
         scoreAtrophy = this.game.time.create(false);
         scoreGrow = this.game.time.create(false);
         scoreGrow.loop(20, this.scoreBoost, this);
         scoreGrow.start();
-
-        showCombo = this.game.time.create(false);
 
         //player parameters
         lad.currentAngle = -90;
@@ -102,19 +100,13 @@ Play.prototype = {
         blackLifeBar.scale.setTo(.1,.1);
         lifeBar = this.game.add.sprite(50,90,"lifebar");
         lifeBar.scale.setTo(.1,.1);
-
-         //display health text
-        // blackHealthText = this.game.add.text(50, 116, 'LIFE', { font: '35px Impact', fill: '#000000' });
-        // healthText = this.game.add.text(50, 116, 'LIFE', { font: '35px Impact', fill: '#ffffff' });
         
-        //display score
+        //display text
         blackScoreText = this.game.add.text(820, 80, 'SCORE  0', { font: '35px Impact', fill: '#000000' });
         scoreText = this.game.add.text(820, 80, 'SCORE  0', { font: '35px Impact', fill: '#ffffff' });
-        //display level
         blackLevelText = this.game.add.text(820, 120, 'LEVEL 1', { font: '35px Impact', fill: '#000000' });
         levelText = this.game.add.text(820, 120, 'LEVEL 1', { font: '35px Impact', fill: '#ffffff' });
-
-        comboText = this.game.add.text(150, 450, 'COMBO!', { font: '90px Impact', fill: '#ffffff' });
+        comboText = this.game.add.text(450, 500, 'COMBO!', { font: '90px Impact', fill: '#ffffff' });
         comboText.alpha = 0;
 
         //load in audio and begin music
@@ -129,12 +121,10 @@ Play.prototype = {
         kick = this.game.add.audio('kick');
         jump = this.game.add.audio('jump');
         jump.allowMultiple = false;
-
         appetizerman = this.game.add.audio('appetizerman', 1, true);
         appetizerman.loop = true;
         appetizerman.play();
         appetizerman.onLoop.add(function(){    appetizerman.play();},this);
-
         appetizerman.volume = 1;
         woosh = this.game.add.audio('woosh');
         woosh.volume = 0.4;
@@ -167,13 +157,8 @@ Play.prototype = {
         this.slowMotion();
         this.growShrinkEnemy();//grow enemy when spawning, shrink when marked, and then kill when size is 0
         //enemy grows when spawning
-
+        this.animateCombo();
         // comboText.scale.setTo(moonRadius/400, moonRadius/400);
-        if((comboScale)<1.01){
-            comboScale+=0.013;comboXPos+=1.62; comboYPos+=0.6;
-            comboText.position.setTo(comboXPos, comboYPos);
-            comboText.scale.setTo((1-comboScale), (1-comboScale))
-        }
     },
 
     spaceUp: function(){
@@ -299,8 +284,6 @@ Play.prototype = {
             if(enemies.getChildAt(i).isWall==true){
                 var enemyDistanceFromCenter = (450 + ladRadius)*scale/jerk / 2 / enemies.getChildAt(i).scoopFactor;
             }
-        //add var to scoop them into moon
-
         //speed = current speed +  slow motion variable * current direction - radius of moon
         enemies.getChildAt(i).currentAngle = this.wrapAngle(enemies.getChildAt(i).currentAngle + enemies.getChildAt(i).direction*slowmo - radiusRelativeSpeed);
         var radians = -enemies.getChildAt(i).currentAngle*Math.PI/180;
@@ -362,7 +345,7 @@ Play.prototype = {
          //  Start the timer again, a bit faster
         spawnEnemy.stop();
         if(timerDifficulty>1500){
-        timerDifficulty -= 100;
+        timerDifficulty -= (Math.random()*100);
         }
         spawnCount ++;
         spawnEnemy.loop(timerDifficulty, this.makeEnemy, this);
@@ -425,10 +408,10 @@ Play.prototype = {
                                 comboText.alpha = 1;
                                 comboText.text = 'COMBO!';
                                 comboText.fill = "#" + randColor;
-                                comboXPos = 345;
-                                comboYPos = 445;
+                                comboXPos = 350;
+                                comboYPos = 450;
                                 comboScale = 0;
-                                this.game.time.events.add(1600, function () {comboText.alpha = 0;}, self);
+                                this.game.time.events.add(1300, function () {comboText.alpha = 0;}, self);
                             }
                         }
                     }
@@ -620,6 +603,14 @@ Play.prototype = {
         scoreGrow.stop();
         document.getElementsByTagName('body')[0].style["background-color"]="black";
         this.game.state.start("GameOver", score, highscore);
+    },
+
+    animateCombo: function(){
+         if((comboScale)<1.01){
+            comboScale+=0.013;comboXPos+=2; comboYPos+=0.6;
+            comboText.position.setTo(comboXPos, comboYPos);
+            comboText.scale.setTo((1-comboScale), (1-comboScale))
+        }
     },
 
     render: function(){
